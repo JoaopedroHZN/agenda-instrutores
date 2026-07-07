@@ -29,6 +29,12 @@ public class Agendamento {
     @Column(length = 500) //Limite para 500 caracteres
     private String observacoes;
 
+    @Column(nullable = false)
+    private String sala;
+
+    @Column(nullable = false)
+    private String horario;
+
     @ManyToOne // Relacionamento Muitos para um
     @JoinColumn(name = "instrutor_id", nullable = false)
     private Instrutor instrutor;
@@ -36,12 +42,14 @@ public class Agendamento {
     public Agendamento() {
     }
 
-    public Agendamento(LocalDate dataAula, Turno turno, String curso, String unidadeCurricular, String observacoes, Instrutor instrutor) {
+    public Agendamento(LocalDate dataAula, Turno turno, String curso, String unidadeCurricular, String observacoes, String sala, String horario, Instrutor instrutor) {
         this.dataAula = dataAula;
         this.turno = turno;
         this.curso = curso;
         this.unidadeCurricular = unidadeCurricular;
         this.observacoes = observacoes;
+        this.sala = sala;
+        this.horario = horario;
         this.instrutor = instrutor;
     }
 
@@ -91,6 +99,22 @@ public class Agendamento {
 
     public void setObservacoes(String observacoes) {
         this.observacoes = observacoes;
+    }
+
+    public String getSala() {
+        return sala;
+    }
+
+    public void setSala(String sala) {
+        this.sala = sala;
+    }
+
+    public String getHorario() {
+        return horario;
+    }
+
+    public void setHorario(String horario) {
+        this.horario = horario;
     }
 
     public Instrutor getInstrutor() {
