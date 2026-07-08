@@ -57,6 +57,14 @@ public class AgendamentoController {
         return org.springframework.http.ResponseEntity.ok(aulasDoProfessor);
     }
 
+    @GetMapping("/buscar-curso")
+    public org.springframework.http.ResponseEntity<java.util.List<Agendamento>> buscarPorCurso(
+            @RequestParam String termo
+    ){
+        java.util.List<Agendamento> resultado = repository.findByCursoContainingIgnoreCase(termo);
+        return org.springframework.http.ResponseEntity.ok(resultado);
+    }
+
     @PostMapping
     public org.springframework.http.ResponseEntity<?> cadastrar(@RequestBody @Valid Agendamento agendamento){
         //Vai no banco e checa se o instrutor enviado ja esta ocupado naquele dia e turno

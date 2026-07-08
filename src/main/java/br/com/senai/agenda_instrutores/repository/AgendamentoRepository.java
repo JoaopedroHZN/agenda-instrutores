@@ -27,6 +27,8 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     java.util.List<Agendamento> findByInstrutorId(Long InstrutorId);
 
 
+    java.util.List<Agendamento> findByCursoContainingIgnoreCase(String termo);
+
 
 
 }
