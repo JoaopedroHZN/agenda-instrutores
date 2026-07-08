@@ -2,6 +2,7 @@ package br.com.senai.agenda_instrutores.controller;
 
 
 import br.com.senai.agenda_instrutores.model.Agendamento;
+import br.com.senai.agenda_instrutores.model.Turno;
 import br.com.senai.agenda_instrutores.repository.AgendamentoRepository;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,39 @@ public class AgendamentoController {
         return repository.findAll();
     }
 
+
+    @GetMapping("/buscar")
+    public org.springframework.http.ResponseEntity<java.util.List<Agendamento>> buscarPorTurno(@RequestParam Turno turno){
+        java.util.List<Agendamento> listaFiltrada = repository.findByTurno(turno);
+
+        return org.springframework.http.ResponseEntity.ok(listaFiltrada);
+    }
+
+    @GetMapping("/buscar-duplo")
+    public org.springframework.http.ResponseEntity<java.util.List<Agendamento>> buscarPorSalaETurno(
+            @RequestParam String sala,
+            @RequestParam Turno turno)
+    {java.util.List<Agendamento> listaFiltrada = repository.findBySalaAndTurno(sala, turno);
+
+        return org.springframework.http.ResponseEntity.ok(listaFiltrada);
+    }
+
+    @GetMapping("/buscar-data")
+    public org.springframework.http.ResponseEntity<java.util.List<Agendamento>> buscarPorData(
+            @RequestParam java.time.LocalDate data
+    ){
+        java.util.List<Agendamento> aulasDoDia = repository.findByDataAula(data);
+        return org.springframework.http.ResponseEntity.ok(aulasDoDia);
+    }
+
+    @GetMapping("/buscar-professor")
+    public org.springframework.http.ResponseEntity<java.util.List<Agendamento>> buscarPorProfessor(
+            @RequestParam Long id
+    ){
+        java.util.List<Agendamento> aulasDoProfessor = repository.findByInstrutorId(id);
+        return org.springframework.http.ResponseEntity.ok(aulasDoProfessor);
+    }
+
     @PostMapping
     public org.springframework.http.ResponseEntity<?> cadastrar(@RequestBody Agendamento agendamento){
         //Vai no banco e checa se o instrutor enviado ja esta ocupado naquele dia e turno
@@ -35,6 +69,18 @@ public class AgendamentoController {
             return org.springframework.http.ResponseEntity
                     .status(400)
                     .body("Erro: Este Instrutor já possui uma aula agendada para este mesmo dia e turno!");
+        }
+
+        boolean salaocupada = repository.existsBySalaAndDataAulaAndTurno(
+                agendamento.getSala(),
+                agendamento.getDataAula(),
+                agendamento.getTurno()
+        );
+
+        if (salaocupada){
+            return org.springframework.http.ResponseEntity
+                    .badRequest()
+                    .body("Erro: Esta sala ou laboratorio ja esta ocupado neste dia e turno!");
         }
 
         //Se for falso o caminho esta limpo e ele devolve o status 200 ok
@@ -59,6 +105,33 @@ public class AgendamentoController {
     public org.springframework.http.ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Agendamento agendamentoAtualizado){
 
         return repository.findById(id).map(agendamentoAntigo ->{
+
+            boolean instrutorOcupado = repository.existsByInstrutorIdAndDataAulaAndTurnoAndIdNot(
+                    agendamentoAtualizado.getInstrutor().getId(),
+                    agendamentoAtualizado.getDataAula(),
+                    agendamentoAtualizado.getTurno(),
+                    id
+            );
+
+            if (instrutorOcupado){
+                return org.springframework.http.ResponseEntity
+                        .badRequest()
+                        .body("Erro: O instrutor ja esta ocupado em outra aula neste turno!");
+            }
+
+            boolean salaOcupada = repository.existsBySalaAndDataAulaAndTurnoAndIdNot(
+                    agendamentoAtualizado.getSala(),
+                    agendamentoAtualizado.getDataAula(),
+                    agendamentoAtualizado.getTurno(),
+                    id
+            );
+
+            if (salaOcupada){
+                return org.springframework.http.ResponseEntity
+                        .badRequest()
+                        .body("Erro: Esta sala ou laboratorio ja esta ocupada por outra turma neste turno!");
+            }
+
             agendamentoAntigo.setDataAula(agendamentoAtualizado.getDataAula());
             agendamentoAntigo.setTurno(agendamentoAtualizado.getTurno());
             agendamentoAntigo.setCurso(agendamentoAtualizado.getCurso());
