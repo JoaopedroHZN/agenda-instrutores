@@ -2,6 +2,8 @@ package br.com.senai.agenda_instrutores.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
@@ -13,28 +15,35 @@ public class Agendamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "A data da aula e obrigatoria!")
     @Column(nullable = false)
     private LocalDate dataAula;
 
+    @NotNull(message = "O turno e obrigatorio")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Turno turno;
 
+    @NotBlank(message = "O nome do curso nao pode ficar em branco")
     @Column(nullable = false)
     private String curso;
 
+    @NotBlank(message = "A unidade curricular e obrigatoria!")
     @Column(nullable = false)
     private String unidadeCurricular;
 
     @Column(length = 500) //Limite para 500 caracteres
     private String observacoes;
 
+    @NotBlank(message = "A sala/laboratorio e obrigatoria!")
     @Column(nullable = false)
     private String sala;
 
+    @NotBlank(message = "O horario da aula e obrigatorio!")
     @Column(nullable = false)
     private String horario;
 
+    @NotNull(message = "O instrutor responsavel e obrigatorio")
     @ManyToOne // Relacionamento Muitos para um
     @JoinColumn(name = "instrutor_id", nullable = false)
     private Instrutor instrutor;
