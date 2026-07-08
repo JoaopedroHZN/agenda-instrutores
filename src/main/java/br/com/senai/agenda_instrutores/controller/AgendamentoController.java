@@ -4,6 +4,7 @@ package br.com.senai.agenda_instrutores.controller;
 import br.com.senai.agenda_instrutores.model.Agendamento;
 import br.com.senai.agenda_instrutores.model.Turno;
 import br.com.senai.agenda_instrutores.repository.AgendamentoRepository;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,7 +58,7 @@ public class AgendamentoController {
     }
 
     @PostMapping
-    public org.springframework.http.ResponseEntity<?> cadastrar(@RequestBody Agendamento agendamento){
+    public org.springframework.http.ResponseEntity<?> cadastrar(@RequestBody @Valid Agendamento agendamento){
         //Vai no banco e checa se o instrutor enviado ja esta ocupado naquele dia e turno
         boolean jaExisteConflito = repository.existsByInstrutorIdAndDataAulaAndTurno(
                 agendamento.getInstrutor().getId(),
@@ -102,7 +103,7 @@ public class AgendamentoController {
     }
 
     @PutMapping("/{id}")
-    public org.springframework.http.ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Agendamento agendamentoAtualizado){
+    public org.springframework.http.ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid Agendamento agendamentoAtualizado){
 
         return repository.findById(id).map(agendamentoAntigo ->{
 
