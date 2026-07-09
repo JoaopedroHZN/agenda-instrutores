@@ -35,4 +35,19 @@ public class InstrutorController {
         Instrutor instrutorSalvo =repository.save(instrutor);
         return ResponseEntity.status(201).body(instrutorSalvo);
     }
+
+    @PutMapping("{id}")
+    public org.springframework.http.ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid Instrutor instrutorAtualizado){
+
+        return repository.findById(id).map(instrutorAntigo ->{
+            instrutorAntigo.setNome(instrutorAtualizado.getNome());
+            instrutorAntigo.setEmail(instrutorAtualizado.getEmail());
+            instrutorAntigo.setSenha(instrutorAtualizado.getSenha());
+            instrutorAntigo.setPerfil(instrutorAtualizado.getPerfil());
+
+            Instrutor salvo = repository.save(instrutorAntigo);
+
+            return org.springframework.http.ResponseEntity.ok(salvo);
+        }).orElse(org.springframework.http.ResponseEntity.notFound().build());
+    }
 }

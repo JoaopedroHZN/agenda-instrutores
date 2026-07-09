@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping ("/agendamentos")
+@RequestMapping ("/agendamentos")//endereço :http://localhost:8080/agendamentos
 public class AgendamentoController {
 
     private final AgendamentoRepository repository;

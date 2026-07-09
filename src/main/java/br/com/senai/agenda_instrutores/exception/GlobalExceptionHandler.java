@@ -44,14 +44,10 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
-
-
-
     }
 
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
     public ResponseEntity<ErroResposta> tratarErroEnumInvalido(org.springframework.http.converter.HttpMessageNotReadableException ex, HttpServletRequest request) {
-
         ErroResposta erro = new ErroResposta(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
@@ -59,13 +55,6 @@ public class GlobalExceptionHandler {
                 "O valor enviado para o perfil está incorreto. Escolha estritamente entre ADMIN ou INSTRUTOR.",
                 request.getRequestURI()
         );
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
-
-
-
-
-
-
 }

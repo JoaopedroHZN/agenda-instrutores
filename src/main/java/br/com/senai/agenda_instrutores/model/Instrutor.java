@@ -1,5 +1,4 @@
 package br.com.senai.agenda_instrutores.model;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -21,7 +20,7 @@ public class Instrutor {
     @Column(nullable = false, unique = true)//unique = true nao pode ter usuario com email duplicado
     private String email;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Apenas escrita, para leitura esconde
+    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Apenas escrita, para leitura esconde
     @Column(nullable = false)
     private String senha;
 
