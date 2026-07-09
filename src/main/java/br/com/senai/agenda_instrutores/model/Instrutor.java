@@ -2,6 +2,8 @@ package br.com.senai.agenda_instrutores.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "instrutores")
@@ -10,9 +12,12 @@ public class Instrutor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "O nome é obrigatório e não pode estar em branco!")
     @Column(nullable = false) //nullable proibido existir instrutor sem nome no banco
     private String nome;
 
+    @NotBlank(message = "O e-mail é obrigatório")
+    @Email(message = "Formato de e-mail inválido")
     @Column(nullable = false, unique = true)//unique = true nao pode ter usuario com email duplicado
     private String email;
 

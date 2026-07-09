@@ -3,6 +3,7 @@ package br.com.senai.agenda_instrutores.controller;
 
 import br.com.senai.agenda_instrutores.model.Instrutor;
 import br.com.senai.agenda_instrutores.repository.InstrutorRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +27,9 @@ public class InstrutorController {
         return repository.findAll();
     }
 
+
     @PostMapping
-    public ResponseEntity<Instrutor> cadastrar(@RequestBody Instrutor instrutor){
+    public ResponseEntity<Instrutor> cadastrar(@Valid @RequestBody Instrutor instrutor){
         String senhaCriptografada = passwordEncoder.encode(instrutor.getSenha());
         instrutor.setSenha(senhaCriptografada);
         Instrutor instrutorSalvo =repository.save(instrutor);
