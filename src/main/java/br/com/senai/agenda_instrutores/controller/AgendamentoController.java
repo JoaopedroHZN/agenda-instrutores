@@ -4,24 +4,25 @@ package br.com.senai.agenda_instrutores.controller;
 import br.com.senai.agenda_instrutores.model.Agendamento;
 import br.com.senai.agenda_instrutores.model.Turno;
 import br.com.senai.agenda_instrutores.repository.AgendamentoRepository;
+import br.com.senai.agenda_instrutores.repository.InstrutorRepository;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping ("/agendamentos")//endereço :http://localhost:8080/agendamentos
 public class AgendamentoController {
 
     private final AgendamentoRepository repository;
+    private final InstrutorRepository instrutorRepository;
 
-    public AgendamentoController(AgendamentoRepository repository){
+    public AgendamentoController(AgendamentoRepository repository, InstrutorRepository instrutorRepository){
         this.repository = repository;
+        this.instrutorRepository = instrutorRepository;
     }
 
     @GetMapping
-    public List<Agendamento> listarTodos(){
-        return repository.findAll();
+    public org.springframework.data.domain.Page<Agendamento> listarTodos(org.springframework.data.domain.Pageable paginacao){
+        return repository.findAll(paginacao);
     }
 
 
@@ -67,6 +68,15 @@ public class AgendamentoController {
 
     @PostMapping
     public org.springframework.http.ResponseEntity<?> cadastrar(@RequestBody @Valid Agendamento agendamento){
+
+        var instrutorCadastrado = instrutorRepository.findById(agendamento.getInstrutor().getId());
+        //Verifica se o instrutor cadastrado tem o perfil igual a ADMIN se for ele barra e nao deixa cadastrar
+        if (instrutorCadastrado.isPresent() && instrutorCadastrado.get().getPerfil().toString().equals("ADMIN")){
+            return org.springframework.http.ResponseEntity
+                    .badRequest()
+                    .body("Erro: Usuarios com perfil ADMIN nao podem ministrar aulas!");
+        }
+
         //Vai no banco e checa se o instrutor enviado ja esta ocupado naquele dia e turno
         boolean jaExisteConflito = repository.existsByInstrutorIdAndDataAulaAndTurno(
                 agendamento.getInstrutor().getId(),
