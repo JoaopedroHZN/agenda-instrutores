@@ -28,6 +28,7 @@ public class InstrutorController {
 
 
     @PostMapping
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Instrutor> cadastrar(@Valid @RequestBody Instrutor instrutor){
         String senhaCriptografada = passwordEncoder.encode(instrutor.getSenha());
         instrutor.setSenha(senhaCriptografada);
@@ -54,6 +55,7 @@ public class InstrutorController {
     }
 
     @DeleteMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public org.springframework.http.ResponseEntity<Void> deletar(@PathVariable Long id){
         //Se nao existe o instrutor ele da nao encontrado
         if(!repository.existsById(id)){

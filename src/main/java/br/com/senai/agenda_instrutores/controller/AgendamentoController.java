@@ -67,6 +67,7 @@ public class AgendamentoController {
     }
 
     @PostMapping
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public org.springframework.http.ResponseEntity<?> cadastrar(@RequestBody @Valid Agendamento agendamento){
 
         var instrutorCadastrado = instrutorRepository.findById(agendamento.getInstrutor().getId());
@@ -109,6 +110,7 @@ public class AgendamentoController {
     }
 
     @DeleteMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public org.springframework.http.ResponseEntity<Void> deletar(@PathVariable Long id){
         //Verifica se o agendamento realmente existe no banco de dados
         if (!repository.existsById(id)){
@@ -121,6 +123,7 @@ public class AgendamentoController {
     }
 
     @PutMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public org.springframework.http.ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid Agendamento agendamentoAtualizado){
 
         return repository.findById(id).map(agendamentoAntigo ->{
