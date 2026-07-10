@@ -2,27 +2,57 @@ package br.com.senai.agenda_instrutores.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
+
+    private final SecurityFilter securityFilter;
+
+    public SecurityConfig(SecurityFilter securityFilter) {
+        this.securityFilter = securityFilter;
+    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
+    // Exportando o Gerente de Autenticação para usarmos no nosso Controller
+    @Bean
+    public org.springframework.security.authentication.AuthenticationManager authenticationManager(
+            org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+
     // 2. A nova regra para pedir ao segurança para liberar as nossas rotas!
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Desabilita a proteção contra ataques de formulário web (obrigatório para APIs REST / Postman)
+                .csrf(csrf -> csrf.disable())
+                // 1. Avisamos ao Spring que a nossa API é REST (Stateless).
+                // Ou seja, não guardamos "sessão" de usuário, cada requisição tem que trazer o Token!
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 2. As novas regras das portas:
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Libera TODAS as requisições sem pedir login por enquanto!
-                );
+                        // Libera SOMENTE a rota de Login (ninguém tem token antes de logar, né?)
+                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        // Qualquer outra rota (listar, salvar, deletar) EXIGE que o cara esteja autenticado!
+                        .anyRequest().authenticated()
+                )
+
+                // 3. Colocamos o nosso Guarda (SecurityFilter) para revistar as pessoas ANTES do filtro padrão do Spring
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

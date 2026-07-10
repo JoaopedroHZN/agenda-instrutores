@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "instrutores")
-public class Instrutor {
+public class Instrutor implements org.springframework.security.core.userdetails.UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -77,4 +77,52 @@ public class Instrutor {
     public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
     }
+
+    @Override
+    public java.util.Collection<? extends org.springframework.security.core.GrantedAuthority> getAuthorities(){
+        //Se for admin tem o poder de admin e de instrutor normal
+        if (this.perfil.toString().equals("ADMIN")){
+            return java.util.List.of(
+                    new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_INSTRUTOR")
+            );
+        }else{
+            //se for instrutor tem so o poder base
+            return java.util.List.of(
+                    new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_INSTRUTOR")
+            );
+        }
+    }
+
+    @Override
+    public String getPassword(){
+        return this.senha;
+    }
+
+    @Override
+    public String getUsername(){
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+
 }

@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface InstrutorRepository extends JpaRepository<Instrutor, Long> {
 
+
+    org.springframework.security.core.userdetails.UserDetails findByEmail(String email);
 }
