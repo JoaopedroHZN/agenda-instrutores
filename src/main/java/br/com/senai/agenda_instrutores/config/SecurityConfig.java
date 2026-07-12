@@ -46,8 +46,9 @@ public class SecurityConfig {
 
                 // 2. As novas regras das portas:
                 .authorizeHttpRequests(auth -> auth
-                        // Libera SOMENTE a rota de Login (ninguém tem token antes de logar, né?)
+                        // Libera SOMENTE a rota de Login (ninguém tem token antes de logar)
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/instrutores/primeiro-acesso").permitAll()
                         // Qualquer outra rota (listar, salvar, deletar) EXIGE que o cara esteja autenticado!
                         .anyRequest().authenticated()
                 )

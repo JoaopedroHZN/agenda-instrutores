@@ -103,6 +103,7 @@ public class AgendamentoController {
                     .body("Erro: Esta sala ou laboratorio ja esta ocupado neste dia e turno!");
         }
 
+        agendamento.setInstrutor(instrutorCadastrado.get());
         //Se for falso o caminho esta limpo e ele devolve o status 200 ok
         Agendamento salvo = repository.save(agendamento);
         return org.springframework.http.ResponseEntity.ok(salvo);

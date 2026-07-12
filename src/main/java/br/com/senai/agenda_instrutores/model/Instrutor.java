@@ -79,6 +79,7 @@ public class Instrutor implements org.springframework.security.core.userdetails.
     }
 
     @Override
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public java.util.Collection<? extends org.springframework.security.core.GrantedAuthority> getAuthorities(){
         //Se for admin tem o poder de admin e de instrutor normal
         if (this.perfil.toString().equals("ADMIN")){

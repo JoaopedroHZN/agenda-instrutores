@@ -1,6 +1,7 @@
 package br.com.senai.agenda_instrutores.controller;
 
 
+import br.com.senai.agenda_instrutores.dto.DadosPrimeiroAcesso;
 import br.com.senai.agenda_instrutores.model.Instrutor;
 import br.com.senai.agenda_instrutores.repository.InstrutorRepository;
 import jakarta.validation.Valid;
@@ -30,13 +31,17 @@ public class InstrutorController {
     @PostMapping
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Instrutor> cadastrar(@Valid @RequestBody Instrutor instrutor){
-        String senhaCriptografada = passwordEncoder.encode(instrutor.getSenha());
-        instrutor.setSenha(senhaCriptografada);
-        Instrutor instrutorSalvo =repository.save(instrutor);
+         if (instrutor.getSenha() != null && !instrutor.getSenha().isBlank()) {
+             String senhaCriptografada = passwordEncoder.encode(instrutor.getSenha());
+             instrutor.setSenha(senhaCriptografada);
+         }
+
+        Instrutor instrutorSalvo = repository.save(instrutor);
         return ResponseEntity.status(201).body(instrutorSalvo);
     }
 
     @PutMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public org.springframework.http.ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid Instrutor instrutorAtualizado){
 
         return repository.findById(id).map(instrutorAntigo ->{
@@ -65,6 +70,28 @@ public class InstrutorController {
         repository.deleteById(id);
 
         return org.springframework.http.ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/primeiro-acesso")
+    public ResponseEntity<?> primeiroAcesso(@RequestBody @Valid DadosPrimeiroAcesso dados){
+
+        // Avisamos ao Java com (Instrutor) que o resultado da busca é a nossa classe original!
+        Instrutor instrutor = (Instrutor) repository.findByEmail(dados.email());
+
+        if (instrutor == null){
+            return ResponseEntity.status(404).body("Email nao encontrado! Verifique se a COPED ja realizou seu cadastro");
+        }
+
+        // Agora o getSenha() e o setSenha() voltam a aparecer perfeitamente!
+        if (instrutor.getSenha() != null && !instrutor.getSenha().isBlank()){
+            return ResponseEntity.badRequest().body("Este email ja possui uma senha cadastrada. Faca o login normal!");
+        }
+
+        String senhaCriptografada = passwordEncoder.encode(dados.novaSenha());
+        instrutor.setSenha(senhaCriptografada);
+        repository.save(instrutor);
+
+        return ResponseEntity.ok("Senha cadastrada com sucesso! Agora voce ja pode entrar no sistema.");
     }
 
 
